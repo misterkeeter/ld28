@@ -108,16 +108,7 @@ function create() {
 
 function update() {
     // Split these conditions up so that they destroy the players
-    if (meOpacity <= 0.2 || youOpacity <= 0.2){
-        game.add.sprite(0,0, 'lose');
-        youPlayer.kill();
-        mePlayer.kill();
-    }
-    if (meScale >=4 || youScale >= 4){
-        game.add.sprite(0,0, 'win')
-        youPlayer.kill();
-        mePlayer.kill();
-    }
+    endGame();
     game.physics.collide(youPlayer, mePlayer, setScaleUp, null, this);
     game.physics.collide(youPlayer, obstacles, setScaleDownYou, null, this);
     game.physics.collide(mePlayer, obstacles, setScaleDownMe, null, this);
@@ -243,6 +234,26 @@ function update() {
         youPlayer.body.velocity.y = -moveSpeed/1.5;
     }
 
+}
+
+function endGame(){
+    if (meOpacity <= 0.2 || youOpacity <= 0.2){
+        lose.play();
+        console.log('lost');
+        game.add.sprite(0,0, 'lose');
+        youPlayer.kill();
+        mePlayer.kill();
+        meOpacity = 1;
+        youOpacity = 1;
+    }
+    else if (meScale >=4 || youScale >= 4){
+        win.play();
+        game.add.sprite(0,0, 'win')
+        youPlayer.kill();
+        mePlayer.kill();
+        meScale = 2;
+        youScale = 2;
+    }
 }
 
 </script>
