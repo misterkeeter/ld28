@@ -25,6 +25,8 @@ function preload() {
     game.load.image('me', 'assets/me.png');
     game.load.image('col', 'assets/col.png');
     game.load.image('start', 'assets/start.png');
+    game.load.image('lose', 'assets/lose.png');
+    game.load.image('win', 'assets/win.png');
 }
 
 var youPlayer;
@@ -33,7 +35,11 @@ var obstacles;
 var starts;
 var playerBounce = 0.8;
 // var playerGravity = -50;
-var togetherTime = 10;
+var charScale = 1;
+var youScale = 1;
+var meScale = 1;
+var scaleUp = 0.1;
+var scaleDown = 0.025;
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -48,7 +54,7 @@ function create() {
     var yMax = game.world.height/25;
 
     obstacles = game.add.group();
-    for (var i=0; i<200; i++){
+    for (var i=0; i<300; i++){
         var xRand = getRandomInt(0,xMax)*25;
         var yRand = getRandomInt(0,yMax)*25;
         var col = obstacles.create(xRand, yRand,'col');
@@ -82,9 +88,17 @@ function create() {
 }
 
 function update() {
-    game.physics.collide(youPlayer, mePlayer);
-    game.physics.collide(youPlayer, obstacles);
-    game.physics.collide(mePlayer, obstacles);
+    // Split these conditions up so that they destroy the players
+    if (meScale <=0 || youScale <= 0){
+        game.add.sprite(0,0, 'lose');
+    }
+    if (meScale >=4 || youScale >= 4){
+        game.add.sprite(0,0, 'win')
+
+    }
+    game.physics.collide(youPlayer, mePlayer, setScaleUp, null, this);
+    game.physics.collide(youPlayer, obstacles, setScaleDownYou, null, this);
+    game.physics.collide(mePlayer, obstacles, setScaleDownMe, null, this);
     game.physics.overlap(obstacles, starts, removeObstacles, null, this);
 
     function removeObstacles(col)
@@ -92,8 +106,33 @@ function update() {
         col.kill();
     }
 
+    function setScaleUp()
+    {
+        meScale += scaleUp;
+        youScale += scaleUp;
+        youPlayer.scale.x = youScale;
+        youPlayer.scale.y = youScale;
+        mePlayer.scale.x = meScale;
+        mePlayer.scale.y = meScale;
 
-    var moveSpeed = 100;
+    }
+
+    function setScaleDownYou(){
+        youScale -= scaleDown;
+        youPlayer.scale.x = youScale;
+        youPlayer.scale.y = youScale;
+    }
+
+    function setScaleDownMe(){
+        meScale -= scaleDown;
+        mePlayer.scale.x = meScale;
+        mePlayer.scale.y = meScale;
+    }
+
+
+
+
+    var moveSpeed = 50;
     var restSpeed = 0;
     mePlayer.rotation = game.physics.angleBetween(mePlayer, youPlayer);
     youPlayer.rotation = game.physics.angleBetween(youPlayer, mePlayer);
