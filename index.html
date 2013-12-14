@@ -35,9 +35,10 @@ var obstacles;
 var starts;
 var playerBounce = 0.8;
 // var playerGravity = -50;
-var charScale = 1;
-var youScale = 1;
-var meScale = 1;
+var youScale = 2;
+var meScale = 2;
+var youOpacity = 1;
+var meOpacity = 1;
 var scaleUp = 0.1;
 var scaleDown = 0.025;
 
@@ -54,7 +55,7 @@ function create() {
     var yMax = game.world.height/25;
 
     obstacles = game.add.group();
-    for (var i=0; i<300; i++){
+    for (var i=0; i<250; i++){
         var xRand = getRandomInt(0,xMax)*25;
         var yRand = getRandomInt(0,yMax)*25;
         var col = obstacles.create(xRand, yRand,'col');
@@ -65,6 +66,12 @@ function create() {
 
     youPlayer = game.add.sprite(game.world.width/2, 0, 'you');
     mePlayer  = game.add.sprite(game.world.width/2, game.world.height, 'me');
+    
+    youPlayer.scale.x = youScale;
+    youPlayer.scale.y = youScale;
+    mePlayer.scale.x = meScale;
+    mePlayer.scale.y = meScale;
+
     mePlayer.anchor.setTo(0.5,0.5);
     youPlayer.anchor.setTo(0.5,0.5);
     
@@ -75,6 +82,7 @@ function create() {
     mePlayer.body.bounce.y = playerBounce;
     youPlayer.body.bounce.x = playerBounce;
     mePlayer.body.bounce.x = playerBounce;
+
 
     // youPlayer.body.gravity.y = -playerGravity;
     // mePlayer.body.gravity.y = playerGravity;
@@ -89,12 +97,15 @@ function create() {
 
 function update() {
     // Split these conditions up so that they destroy the players
-    if (meScale <=0 || youScale <= 0){
+    if (meOpacity <= 0.2 || youOpacity <= 0.2){
         game.add.sprite(0,0, 'lose');
+        youPlayer.kill();
+        mePlayer.kill();
     }
     if (meScale >=4 || youScale >= 4){
         game.add.sprite(0,0, 'win')
-
+        youPlayer.kill();
+        mePlayer.kill();
     }
     game.physics.collide(youPlayer, mePlayer, setScaleUp, null, this);
     game.physics.collide(youPlayer, obstacles, setScaleDownYou, null, this);
@@ -108,6 +119,10 @@ function update() {
 
     function setScaleUp()
     {
+        meOpacity = 1;
+        mePlayer.alpha = 1;
+        youOpacity = 1;
+        youPlayer.alpha = 1;
         meScale += scaleUp;
         youScale += scaleUp;
         youPlayer.scale.x = youScale;
@@ -118,21 +133,37 @@ function update() {
     }
 
     function setScaleDownYou(){
-        youScale -= scaleDown;
-        youPlayer.scale.x = youScale;
-        youPlayer.scale.y = youScale;
+        if (youScale >= 1)
+        {
+            youScale -= scaleDown;
+            youPlayer.scale.x = youScale;
+            youPlayer.scale.y = youScale;
+        }
+        else
+        {
+            youOpacity = youOpacity -0.01;
+            youPlayer.alpha = youOpacity;
+        }
     }
 
     function setScaleDownMe(){
-        meScale -= scaleDown;
-        mePlayer.scale.x = meScale;
-        mePlayer.scale.y = meScale;
+        if (meScale >= 1)
+        {
+            meScale -= scaleDown;
+            mePlayer.scale.x = meScale;
+            mePlayer.scale.y = meScale;
+        }
+        else
+        {
+            meOpacity = meOpacity -0.01;
+            mePlayer.alpha = meOpacity;
+        }
     }
 
 
 
 
-    var moveSpeed = 50;
+    var moveSpeed = 75;
     var restSpeed = 0;
     mePlayer.rotation = game.physics.angleBetween(mePlayer, youPlayer);
     youPlayer.rotation = game.physics.angleBetween(youPlayer, mePlayer);
