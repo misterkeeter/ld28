@@ -27,12 +27,14 @@ function preload() {
 
 var youPlayer;
 var mePlayer;
-var playerBounce = 0.5;
-var playerGravity = -50;
+var playerBounce = 0.2;
+var playerGravity = -10;
 
 function create() {
-    youPlayer = game.add.sprite(100,100, 'you');
-    mePlayer  = game.add.sprite(game.world.width -100, game.world.height -100, 'me');
+    youPlayer = game.add.sprite(game.world.width/2, game.world.height/2, 'you');
+    mePlayer  = game.add.sprite(game.world.width/2, game.world.height/2, 'me');
+    mePlayer.anchor.setTo(0.5,0.5);
+    youPlayer.anchor.setTo(0.5,0.5);
 
     youPlayer.body.bounce.y = playerBounce;
     mePlayer.body.bounce.y = playerBounce;
@@ -48,16 +50,20 @@ function create() {
     cursor = game.input.keyboard.createCursorKeys();
 }
 
+var togetherTime = 10
 
 function update() {
     game.physics.collide(youPlayer, mePlayer);
 
-    var moveSpeed = 200;
-    var restSpeed = 5;
 
-    // mePlayer.body.velocity.x = restSpeed;
+    var moveSpeed = 100
+    var restSpeed = 0;
+    mePlayer.rotation = game.physics.angleBetween(mePlayer, youPlayer);
+    youPlayer.rotation = game.physics.angleBetween(youPlayer, mePlayer);
+
+    mePlayer.body.velocity.x = restSpeed;
     // mePlayer.body.velocity.y = restSpeed;
-    // youPlayer.body.velocity.x = -restSpeed;
+    youPlayer.body.velocity.x = -restSpeed;
     // youPlayer.body.velocity.y = -restSpeed;
 
     //Left and Right
@@ -119,6 +125,6 @@ function update() {
 }
 
 </script>
-
+<p>Use the arrow keys to move</p>
 </body>
 </html>
