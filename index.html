@@ -23,24 +23,55 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload:preload,  create
 function preload() {
     game.load.image('you', 'assets/you.png');
     game.load.image('me', 'assets/me.png');
+    game.load.image('col', 'assets/col.png');
+    game.load.image('start', 'assets/start.png');
 }
 
 var youPlayer;
 var mePlayer;
-var playerBounce = 0.2;
-var playerGravity = -10;
+var obstacles;
+var starts;
+var playerBounce = 0.8;
+// var playerGravity = -50;
+var togetherTime = 10;
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
 function create() {
-    youPlayer = game.add.sprite(game.world.width/2, game.world.height/2, 'you');
-    mePlayer  = game.add.sprite(game.world.width/2, game.world.height/2, 'me');
+    starts = game.add.group();
+    var start = starts.create(game.world.width/2-25, 0, 'start');
+    start = starts.create(game.world.width/2-25, game.world.height-50, 'start' );
+
+    var xMax = game.world.width/25;
+    var yMax = game.world.height/25;
+
+    obstacles = game.add.group();
+    for (var i=0; i<200; i++){
+        var xRand = getRandomInt(0,xMax)*25;
+        var yRand = getRandomInt(0,yMax)*25;
+        var col = obstacles.create(xRand, yRand,'col');
+        col.body.immovable = true;
+    }
+
+
+
+    youPlayer = game.add.sprite(game.world.width/2, 0, 'you');
+    mePlayer  = game.add.sprite(game.world.width/2, game.world.height, 'me');
     mePlayer.anchor.setTo(0.5,0.5);
     youPlayer.anchor.setTo(0.5,0.5);
+    
+
+
 
     youPlayer.body.bounce.y = playerBounce;
     mePlayer.body.bounce.y = playerBounce;
+    youPlayer.body.bounce.x = playerBounce;
+    mePlayer.body.bounce.x = playerBounce;
 
-    youPlayer.body.gravity.y = -playerGravity;
-    mePlayer.body.gravity.y = playerGravity;
+    // youPlayer.body.gravity.y = -playerGravity;
+    // mePlayer.body.gravity.y = playerGravity;
 
 
     youPlayer.body.collideWorldBounds = true;
@@ -50,20 +81,26 @@ function create() {
     cursor = game.input.keyboard.createCursorKeys();
 }
 
-var togetherTime = 10
-
 function update() {
     game.physics.collide(youPlayer, mePlayer);
+    game.physics.collide(youPlayer, obstacles);
+    game.physics.collide(mePlayer, obstacles);
+    game.physics.overlap(obstacles, starts, removeObstacles, null, this);
+
+    function removeObstacles(col)
+    {
+        col.kill();
+    }
 
 
-    var moveSpeed = 100
+    var moveSpeed = 100;
     var restSpeed = 0;
     mePlayer.rotation = game.physics.angleBetween(mePlayer, youPlayer);
     youPlayer.rotation = game.physics.angleBetween(youPlayer, mePlayer);
 
-    mePlayer.body.velocity.x = restSpeed;
+    // mePlayer.body.velocity.x = restSpeed;
     // mePlayer.body.velocity.y = restSpeed;
-    youPlayer.body.velocity.x = -restSpeed;
+    // youPlayer.body.velocity.x = -restSpeed;
     // youPlayer.body.velocity.y = -restSpeed;
 
     //Left and Right
