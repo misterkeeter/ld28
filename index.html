@@ -109,7 +109,7 @@ function create() {
 function update() {
     // Split these conditions up so that they destroy the players
     endGame();
-    game.physics.overlap(youPlayer, mePlayer, setScaleUp, null, this);
+    game.physics.collide(youPlayer, mePlayer, setScaleUp, null, this);
     game.physics.collide(youPlayer, obstacles, setScaleDownYou, null, this);
     game.physics.collide(mePlayer, obstacles, setScaleDownMe, null, this);
     game.physics.overlap(obstacles, starts, removeObstacles, null, this);
