@@ -27,8 +27,8 @@ function preload() {
 
 var youPlayer;
 var mePlayer;
-var playerBounce = 0.2;
-var playerGravity = 2;
+var playerBounce = 0.5;
+var playerGravity = -50;
 
 function create() {
     youPlayer = game.add.sprite(100,100, 'you');
@@ -53,12 +53,12 @@ function update() {
     game.physics.collide(youPlayer, mePlayer);
 
     var moveSpeed = 200;
-    var restSpeed = 50;
+    var restSpeed = 5;
 
-    mePlayer.body.velocity.x = restSpeed;
+    // mePlayer.body.velocity.x = restSpeed;
     // mePlayer.body.velocity.y = restSpeed;
-    youPlayer.body.velocity.x = restSpeed;
-    // youPlayer.body.velocity.y = restSpeed;
+    // youPlayer.body.velocity.x = -restSpeed;
+    // youPlayer.body.velocity.y = -restSpeed;
 
     //Left and Right
     if (cursor.left.isDown)
@@ -87,33 +87,33 @@ function update() {
     //Left Diagonals
     if (cursor.left.isDown && cursor.up.isDown)
     {
-        mePlayer.body.velocity.x = -moveSpeed;
-        youPlayer.body.velocity.x = moveSpeed;
-        mePlayer.body.velocity.y = -moveSpeed;
-        youPlayer.body.velocity.y = moveSpeed;
+        mePlayer.body.velocity.x = -moveSpeed/2;
+        youPlayer.body.velocity.x = moveSpeed/2;
+        mePlayer.body.velocity.y = -moveSpeed/2;
+        youPlayer.body.velocity.y = moveSpeed/2;
     }
     else if (cursor.left.isDown && cursor.down.isDown)
     {
-        mePlayer.body.velocity.x = -moveSpeed;
-        youPlayer.body.velocity.x = moveSpeed;
-        mePlayer.body.velocity.y = moveSpeed;
-        youPlayer.body.velocity.y = -moveSpeed;
+        mePlayer.body.velocity.x = -moveSpeed/2;
+        youPlayer.body.velocity.x = moveSpeed/2;
+        mePlayer.body.velocity.y = moveSpeed/2;
+        youPlayer.body.velocity.y = -moveSpeed/2;
     }
 
     //Right Diagonals
     if (cursor.right.isDown && cursor.up.isDown)
     {
-        mePlayer.body.velocity.x = moveSpeed;
-        youPlayer.body.velocity.x = -moveSpeed;
-        mePlayer.body.velocity.y = -moveSpeed;
-        youPlayer.body.velocity.y = moveSpeed;
+        mePlayer.body.velocity.x = moveSpeed/1.5;
+        youPlayer.body.velocity.x = -moveSpeed/1.5;
+        mePlayer.body.velocity.y = -moveSpeed/1.5;
+        youPlayer.body.velocity.y = moveSpeed/1.5;
     }
     else if (cursor.right.isDown && cursor.down.isDown)
     {
-        mePlayer.body.velocity.x = moveSpeed;
-        youPlayer.body.velocity.x = -moveSpeed;
-        mePlayer.body.velocity.y = moveSpeed;
-        youPlayer.body.velocity.y = -moveSpeed;
+        mePlayer.body.velocity.x = moveSpeed/1.5;
+        youPlayer.body.velocity.x = -moveSpeed/1.5;
+        mePlayer.body.velocity.y = moveSpeed/1.5;
+        youPlayer.body.velocity.y = -moveSpeed/1.5;
     }
 
 }
