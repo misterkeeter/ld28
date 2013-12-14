@@ -96,6 +96,12 @@ function create() {
     youPlayer.body.collideWorldBounds = true;
     mePlayer.body.collideWorldBounds = true;
 
+    love = game.add.audio('love',1,false);
+    win = game.add.audio('win',1,false);
+    downYou = game.add.audio('downYou',0.25,false);
+    downMe = game.add.audio('downMe',0.25,false);
+    lose = game.add.audio('lose',1,false);
+
 
     cursor = game.input.keyboard.createCursorKeys();
 }
@@ -124,6 +130,7 @@ function update() {
 
     function setScaleUp()
     {
+        love.play();
         meOpacity = 1;
         mePlayer.alpha = 1;
         youOpacity = 1;
@@ -138,6 +145,7 @@ function update() {
     }
 
     function setScaleDownYou(){
+        downYou.play();
         if (youScale >= 1)
         {
             youScale -= scaleDown;
@@ -152,6 +160,7 @@ function update() {
     }
 
     function setScaleDownMe(){
+        downMe.play();
         if (meScale >= 1)
         {
             meScale -= scaleDown;
