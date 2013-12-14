@@ -9,7 +9,7 @@
             text-align: center;
         }
         body {
-            margin: 50px auto;
+            margin: 10px auto;
             display: inline-block;
         }
     </style>
@@ -27,6 +27,11 @@ function preload() {
     game.load.image('start', 'assets/start.png');
     game.load.image('lose', 'assets/lose.png');
     game.load.image('win', 'assets/win.png');
+    game.load.audio('downYou', 'assets/downYou.mp3');
+    game.load.audio('downMe', 'assets/downMe.mp3');
+    game.load.audio('love', 'assets/love.mp3');
+    game.load.audio('lose', 'assets/lose.mp3');
+    game.load.audio('win', 'assets/win.mp3');
 }
 
 var youPlayer;
@@ -34,13 +39,14 @@ var mePlayer;
 var obstacles;
 var starts;
 var playerBounce = 0.8;
-// var playerGravity = -50;
+var colGravity = 20;
 var youScale = 2;
 var meScale = 2;
 var youOpacity = 1;
 var meOpacity = 1;
 var scaleUp = 0.1;
-var scaleDown = 0.025;
+var scaleDown = 0.125;
+var down, love, lose, win;
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -61,6 +67,14 @@ function create() {
         var col = obstacles.create(xRand, yRand,'col');
         col.body.immovable = true;
     }
+
+    love = game.add.audio('love',1,false);
+    win = game.add.audio('win',1,false);
+    downYou = game.add.audio('downYou',0.25,false);
+    downMe = game.add.audio('downMe',0.25,false);
+    lose = game.add.audio('lose',1,false);
+
+
 
 
 
@@ -97,16 +111,7 @@ function create() {
 
 function update() {
     // Split these conditions up so that they destroy the players
-    if (meOpacity <= 0.2 || youOpacity <= 0.2){
-        game.add.sprite(0,0, 'lose');
-        youPlayer.kill();
-        mePlayer.kill();
-    }
-    if (meScale >=4 || youScale >= 4){
-        game.add.sprite(0,0, 'win')
-        youPlayer.kill();
-        mePlayer.kill();
-    }
+    endGame();
     game.physics.collide(youPlayer, mePlayer, setScaleUp, null, this);
     game.physics.collide(youPlayer, obstacles, setScaleDownYou, null, this);
     game.physics.collide(mePlayer, obstacles, setScaleDownMe, null, this);
@@ -115,11 +120,13 @@ function update() {
     function removeObstacles(col)
     {
         col.kill();
+
     }
 
     function setScaleUp()
     {
         meOpacity = 1;
+        love.play();
         mePlayer.alpha = 1;
         youOpacity = 1;
         youPlayer.alpha = 1;
@@ -130,9 +137,11 @@ function update() {
         mePlayer.scale.x = meScale;
         mePlayer.scale.y = meScale;
 
+
     }
 
-    function setScaleDownYou(){
+    function setScaleDownYou(player, col){
+        downYou.play();
         if (youScale >= 1)
         {
             youScale -= scaleDown;
@@ -141,12 +150,14 @@ function update() {
         }
         else
         {
-            youOpacity = youOpacity -0.01;
+            youOpacity = youOpacity -0.1;
             youPlayer.alpha = youOpacity;
         }
+        setScaleObs(col);
     }
 
-    function setScaleDownMe(){
+    function setScaleDownMe(player, col){
+        downMe.play();
         if (meScale >= 1)
         {
             meScale -= scaleDown;
@@ -155,9 +166,23 @@ function update() {
         }
         else
         {
-            meOpacity = meOpacity -0.01;
+            meOpacity = meOpacity -0.1;
             mePlayer.alpha = meOpacity;
         }
+        setScaleObs(col);
+    }
+
+    function setScaleObs(col){
+        col.alpha -= .3;
+        if (col.alpha <= 0){
+            col.kill();
+        }
+        // col.body.immovable = false;
+        // col.body.gravity.y = colGravity;
+        // col.body.bounce.y = playerBounce;
+        // col.body.bounce.x = playerBounce;
+        // col.body.collideWorldBounds = true;
+        console.log('setSCaleObs');
     }
 
 
@@ -231,7 +256,29 @@ function update() {
 
 }
 
+function endGame(){
+    if (meOpacity <= 0.2 || youOpacity <= 0.2){
+        lose.play();
+        console.log('lost');
+        game.add.sprite(0,0, 'lose');
+        youPlayer.kill();
+        mePlayer.kill();
+        meOpacity = 1;
+        youOpacity = 1;
+    }
+    else if (meScale >=4 || youScale >= 4){
+        win.play();
+        game.add.sprite(0,0, 'win')
+        youPlayer.kill();
+        mePlayer.kill();
+        meScale = 2;
+        youScale = 2;
+    }
+}
+
+
 </script>
 <p>Use the arrow keys to move</p>
+<p>Try to find your other</p>
 </body>
 </html>
