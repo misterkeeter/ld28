@@ -109,7 +109,7 @@ function create() {
 function update() {
     // Split these conditions up so that they destroy the players
     endGame();
-    game.physics.collide(youPlayer, mePlayer, setScaleUp, null, this);
+    game.physics.overlap(youPlayer, mePlayer, setScaleUp, null, this);
     game.physics.collide(youPlayer, obstacles, setScaleDownYou, null, this);
     game.physics.collide(mePlayer, obstacles, setScaleDownMe, null, this);
     game.physics.overlap(obstacles, starts, removeObstacles, null, this);
@@ -132,10 +132,9 @@ function update() {
         youPlayer.scale.y = youScale;
         mePlayer.scale.x = meScale;
         mePlayer.scale.y = meScale;
-
     }
 
-    function setScaleDownYou(){
+    function setScaleDownYou(player,col){
         downYou.play();
         if (youScale >= 1)
         {
@@ -148,9 +147,12 @@ function update() {
             youOpacity = youOpacity -0.01;
             youPlayer.alpha = youOpacity;
         }
+        if (youScale > 4){
+            col.kill();
+        }
     }
 
-    function setScaleDownMe(){
+    function setScaleDownMe(player,col){
         downMe.play();
         if (meScale >= 1)
         {
@@ -162,6 +164,9 @@ function update() {
         {
             meOpacity = meOpacity -0.01;
             mePlayer.alpha = meOpacity;
+        }
+        if (meScale > 4){
+            col.kill();
         }
     }
 
@@ -246,7 +251,7 @@ function endGame(){
         meOpacity = 1;
         youOpacity = 1;
     }
-    else if (meScale >=4 || youScale >= 4){
+    else if (meScale >=20 || youScale >= 20){
         win.play();
         game.add.sprite(0,0, 'win')
         youPlayer.kill();
