@@ -18,7 +18,7 @@
 
 <script type="text/javascript">
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload:preload,  create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload:preload,  create: create, update: update });
 
 function preload() {
     game.load.image('you', 'assets/you.png');
@@ -32,6 +32,7 @@ function preload() {
     game.load.audio('love', 'assets/love.mp3');
     game.load.audio('lose', 'assets/lose.mp3');
     game.load.audio('win', 'assets/win.mp3');
+    game.load.audio('theme', 'assets/siamesetheme.mp3');
 }
 
 var youPlayer;
@@ -46,12 +47,15 @@ var youOpacity = 1;
 var meOpacity = 1;
 var scaleUp = 0.1;
 var scaleDown = 0.025;
+var downYou, downMe, love, lose, win, theme;
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function create() {
+    Phaser.Canvas.setSmoothingEnabled(game.context, false);
+    // game.stage.backgroundColor = '#8e8d8d';
     starts = game.add.group();
     var start = starts.create(game.world.width/2-25, 0, 'start');
     start = starts.create(game.world.width/2-25, game.world.height-50, 'start' );
@@ -69,8 +73,8 @@ function create() {
 
 
 
-    youPlayer = game.add.sprite(game.world.width/2, 0, 'you');
-    mePlayer  = game.add.sprite(game.world.width/2, game.world.height, 'me');
+    youPlayer = game.add.sprite(game.world.width/2, 25, 'you');
+    mePlayer  = game.add.sprite(game.world.width/2, game.world.height-25, 'me');
     
     youPlayer.scale.x = youScale;
     youPlayer.scale.y = youScale;
@@ -79,6 +83,9 @@ function create() {
 
     mePlayer.anchor.setTo(0.5,0.5);
     youPlayer.anchor.setTo(0.5,0.5);
+
+    mePlayer.angle = 0;
+    youPlayer.angle = 180;
     
 
 
@@ -96,11 +103,13 @@ function create() {
     youPlayer.body.collideWorldBounds = true;
     mePlayer.body.collideWorldBounds = true;
 
-    love = game.add.audio('love',1,false);
+    love = game.add.audio('love',.25,true);
     win = game.add.audio('win',1,false);
     downYou = game.add.audio('downYou',0.25,false);
     downMe = game.add.audio('downMe',0.25,false);
     lose = game.add.audio('lose',1,false);
+    theme = game.add.audio('theme',1,true);
+    theme.play('',0,0.5,true);
 
 
     cursor = game.input.keyboard.createCursorKeys();
@@ -126,8 +135,14 @@ function update() {
         mePlayer.alpha = 1;
         youOpacity = 1;
         youPlayer.alpha = 1;
-        meScale += scaleUp;
-        youScale += scaleUp;
+        if (youScale >= 4 || meScale >= 4){
+            meScale += scaleUp*50;
+            youScale += scaleUp*50;
+        }
+        else{
+            meScale += scaleUp;
+            youScale += scaleUp;   
+        }
         youPlayer.scale.x = youScale;
         youPlayer.scale.y = youScale;
         mePlayer.scale.x = meScale;
@@ -135,6 +150,7 @@ function update() {
     }
 
     function setScaleDownYou(player,col){
+        love.stop();
         downYou.play();
         if (youScale >= 1)
         {
@@ -153,6 +169,7 @@ function update() {
     }
 
     function setScaleDownMe(player,col){
+        love.stop();
         downMe.play();
         if (meScale >= 1)
         {
@@ -248,6 +265,7 @@ function endGame(){
         game.add.sprite(0,0, 'lose');
         youPlayer.kill();
         mePlayer.kill();
+        theme.stop();
         meOpacity = 1;
         youOpacity = 1;
     }
@@ -256,9 +274,11 @@ function endGame(){
         game.add.sprite(0,0, 'win')
         youPlayer.kill();
         mePlayer.kill();
+        theme.stop();
         meScale = 2;
         youScale = 2;
     }
+    // theme.stop();
 }
 
 </script>
