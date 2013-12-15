@@ -29,7 +29,7 @@ function preload() {
     game.load.image('win', 'assets/win.png');
     game.load.audio('downYou', 'assets/downYou.mp3');
     game.load.audio('downMe', 'assets/downMe.mp3');
-    game.load.audio('love', 'assets/love.mp3');
+    game.load.audio('love', 'assets/loveloop.mp3');
     game.load.audio('lose', 'assets/lose.mp3');
     game.load.audio('win', 'assets/win.mp3');
     game.load.audio('theme', 'assets/siamesetheme.mp3');
@@ -48,6 +48,7 @@ var meOpacity = 1;
 var scaleUp = 0.1;
 var scaleDown = 0.025;
 var downYou, downMe, love, lose, win, theme;
+var gameStart = true;
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -57,8 +58,12 @@ function create() {
     Phaser.Canvas.setSmoothingEnabled(game.context, false);
     // game.stage.backgroundColor = '#8e8d8d';
     starts = game.add.group();
-    var start = starts.create(game.world.width/2-25, 0, 'start');
-    start = starts.create(game.world.width/2-25, game.world.height-50, 'start' );
+    var start = starts.create(game.world.width/2-50, -50, 'start');
+    start.scale.x = 2;
+    start.scale.y = 2;
+    start = starts.create(game.world.width/2-50, game.world.height-50, 'start' );
+    start.scale.x = 2;
+    start.scale.y = 2;
 
     var xMax = game.world.width/25;
     var yMax = game.world.height/25;
@@ -118,6 +123,7 @@ function create() {
 function update() {
     // Split these conditions up so that they destroy the players
     endGame();
+    if (gameStart){control()};
     game.physics.collide(youPlayer, mePlayer, setScaleUp, null, this);
     game.physics.collide(youPlayer, obstacles, setScaleDownYou, null, this);
     game.physics.collide(mePlayer, obstacles, setScaleDownMe, null, this);
@@ -135,14 +141,14 @@ function update() {
         mePlayer.alpha = 1;
         youOpacity = 1;
         youPlayer.alpha = 1;
-        if (youScale >= 4 || meScale >= 4){
-            meScale += scaleUp*50;
-            youScale += scaleUp*50;
-        }
-        else{
+        // if (youScale >= 4 || meScale >= 4){
+        //     meScale += scaleUp*50;
+        //     youScale += scaleUp*50;
+        // }
+        // else{
             meScale += scaleUp;
             youScale += scaleUp;   
-        }
+        // }
         youPlayer.scale.x = youScale;
         youPlayer.scale.y = youScale;
         mePlayer.scale.x = meScale;
@@ -163,9 +169,11 @@ function update() {
             youOpacity = youOpacity -0.01;
             youPlayer.alpha = youOpacity;
         }
-        if (youScale > 4){
-            col.kill();
+
+        if (youScale >= 4){
+            col.kill()
         }
+
     }
 
     function setScaleDownMe(player,col){
@@ -182,14 +190,38 @@ function update() {
             meOpacity = meOpacity -0.01;
             mePlayer.alpha = meOpacity;
         }
-        if (meScale > 4){
-            col.kill();
+         if (meScale >= 4){
+            col.kill()
         }
+        
     }
+    backColor();
 
+}
 
+function backColor(){
+    if ((meScale >= 3 && meScale < 5) && (youScale >= 3 && youScale < 5)){
+        game.stage.backgroundColor = '#666666';
+    }
+    if ((meScale >= 5 && meScale < 6) && (youScale >= 5 && youScale < 6)){
+        game.stage.backgroundColor = '#999999';
+    }
+    if ((meScale >= 6 && meScale < 7) && (youScale >= 6 && youScale < 7)){
+        game.stage.backgroundColor = '#b8b8b8';
+    }
+    if ((meScale >= 7 && meScale < 8) && (youScale >= 7 && youScale < 8)){
+        game.stage.backgroundColor = '#cccccc';
+    }
+    // if ((meScale >= 6 && meScale < 8) || (youScale >= 6 && youScale < 8)){
+    //     game.stage.backgroundColor = '#cccccc';
+    // }
+    // if ((meScale >= 6 && meScale < 8) || (youScale >= 6 && youScale < 8)){
+    //     game.stage.backgroundColor = '#cccccc';
+    // }
 
+}
 
+function control(){
     var moveSpeed = 75;
     var restSpeed = 0;
     mePlayer.rotation = game.physics.angleBetween(mePlayer, youPlayer);
@@ -255,7 +287,6 @@ function update() {
         mePlayer.body.velocity.y = moveSpeed/1.5;
         youPlayer.body.velocity.y = -moveSpeed/1.5;
     }
-
 }
 
 function endGame(){
@@ -269,7 +300,7 @@ function endGame(){
         meOpacity = 1;
         youOpacity = 1;
     }
-    else if (meScale >=20 || youScale >= 20){
+    else if (meScale >=8 || youScale >= 8){
         win.play();
         game.add.sprite(0,0, 'win')
         youPlayer.kill();
