@@ -18,7 +18,7 @@
 
 <script type="text/javascript">
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload:preload,  create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload:preload,  create: create, update: update, render:render });
 
 function preload() {
     game.load.image('you', 'assets/you.png');
@@ -40,7 +40,7 @@ var mePlayer;
 var obstacles;
 var starts;
 var playerBounce = 0.8;
-// var playerGravity = -50;
+var colGravity = 50;
 var youScale = 2;
 var meScale = 2;
 var youOpacity = 1;
@@ -136,8 +136,8 @@ function update() {
         youOpacity = 1;
         youPlayer.alpha = 1;
         if (youScale >= 4 || meScale >= 4){
-            meScale += scaleUp*50;
-            youScale += scaleUp*50;
+            meScale += scaleUp*25;
+            youScale += scaleUp*25;
         }
         else{
             meScale += scaleUp;
@@ -164,7 +164,11 @@ function update() {
             youPlayer.alpha = youOpacity;
         }
         if (youScale > 4){
-            col.kill();
+                col.body.immovable = false;
+        col.body.gravity.y = colGravity;
+        col.body.bounce.y = playerBounce;
+        col.body.bounce.x = playerBounce;
+        // col.body.collideWorldBounds = true;
         }
     }
 
@@ -183,7 +187,12 @@ function update() {
             mePlayer.alpha = meOpacity;
         }
         if (meScale > 4){
-            col.kill();
+            col.body.immovable = false;
+        col.body.gravity.y = colGravity;
+        col.body.bounce.y = playerBounce;
+        col.body.bounce.x = playerBounce;
+        // col.body.collideWorldBounds = true;
+            // col.kill();
         }
     }
 
@@ -224,38 +233,43 @@ function update() {
         youPlayer.body.velocity.y = moveSpeed;
     }
 
-    //Left Diagonals
-    if (cursor.left.isDown && cursor.up.isDown)
-    {
-        mePlayer.body.velocity.x = -moveSpeed/2;
-        youPlayer.body.velocity.x = moveSpeed/2;
-        mePlayer.body.velocity.y = -moveSpeed/2;
-        youPlayer.body.velocity.y = moveSpeed/2;
-    }
-    else if (cursor.left.isDown && cursor.down.isDown)
-    {
-        mePlayer.body.velocity.x = -moveSpeed/2;
-        youPlayer.body.velocity.x = moveSpeed/2;
-        mePlayer.body.velocity.y = moveSpeed/2;
-        youPlayer.body.velocity.y = -moveSpeed/2;
-    }
+    // //Left Diagonals
+    // if (cursor.left.isDown && cursor.up.isDown)
+    // {
+    //     mePlayer.body.velocity.x = -moveSpeed/2;
+    //     youPlayer.body.velocity.x = moveSpeed/2;
+    //     mePlayer.body.velocity.y = -moveSpeed/2;
+    //     youPlayer.body.velocity.y = moveSpeed/2;
+    // }
+    // else if (cursor.left.isDown && cursor.down.isDown)
+    // {
+    //     mePlayer.body.velocity.x = -moveSpeed/2;
+    //     youPlayer.body.velocity.x = moveSpeed/2;
+    //     mePlayer.body.velocity.y = moveSpeed/2;
+    //     youPlayer.body.velocity.y = -moveSpeed/2;
+    // }
 
-    //Right Diagonals
-    if (cursor.right.isDown && cursor.up.isDown)
-    {
-        mePlayer.body.velocity.x = moveSpeed/1.5;
-        youPlayer.body.velocity.x = -moveSpeed/1.5;
-        mePlayer.body.velocity.y = -moveSpeed/1.5;
-        youPlayer.body.velocity.y = moveSpeed/1.5;
-    }
-    else if (cursor.right.isDown && cursor.down.isDown)
-    {
-        mePlayer.body.velocity.x = moveSpeed/1.5;
-        youPlayer.body.velocity.x = -moveSpeed/1.5;
-        mePlayer.body.velocity.y = moveSpeed/1.5;
-        youPlayer.body.velocity.y = -moveSpeed/1.5;
-    }
+    // //Right Diagonals
+    // if (cursor.right.isDown && cursor.up.isDown)
+    // {
+    //     mePlayer.body.velocity.x = moveSpeed/1.5;
+    //     youPlayer.body.velocity.x = -moveSpeed/1.5;
+    //     mePlayer.body.velocity.y = -moveSpeed/1.5;
+    //     youPlayer.body.velocity.y = moveSpeed/1.5;
+    // }
+    // else if (cursor.right.isDown && cursor.down.isDown)
+    // {
+    //     mePlayer.body.velocity.x = moveSpeed/1.5;
+    //     youPlayer.body.velocity.x = -moveSpeed/1.5;
+    //     mePlayer.body.velocity.y = moveSpeed/1.5;
+    //     youPlayer.body.velocity.y = -moveSpeed/1.5;
+    // }
 
+}
+
+function render(){
+    // game.debug.renderSpriteBody(mePlayer);
+    // game.debug.renderSpriteBody(youPlayer);
 }
 
 function endGame(){
@@ -278,7 +292,6 @@ function endGame(){
         meScale = 2;
         youScale = 2;
     }
-    // theme.stop();
 }
 
 </script>
