@@ -1,30 +1,32 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
-    <meta charset="UTF-8" />
-    <title>Siamese</title>
-    <script type="text/javascript" src="js/phaser.min.js"></script>
-    <script type="text/javascript" src="js/Boot.js"></script>
-    <script type="text/javascript" src="js/Preloader.js"></script>
-    <script type="text/javascript" src="js/MainMenu.js"></script>
-    <script type="text/javascript" src="js/Game.js"></script>
-    <style type="text/css">
-        html{
-            text-align: center;
-        }
-        body {
-            margin: 10px auto;
-            display: inline-block;
-        }
-    </style>
-</head>
-<body>
 
-<script type="text/javascript">
+BasicGame.Game = function (game) {
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload:preload,  create: create, update: update });
+	//	When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
 
-function preload() {
+    this.game;		//	a reference to the currently running game
+    this.add;		//	used to add sprites, text, groups, etc
+    this.camera;	//	a reference to the game camera
+    this.cache;		//	the game cache
+    this.input;		//	the global input manager (you can access this.input.keyboard, this.input.mouse, as well from it)
+    this.load;		//	for preloading assets
+    this.math;		//	lots of useful common math operations
+    this.sound;		//	the sound manager - add a sound, play one, set-up markers, etc
+    this.stage;		//	the game stage
+    this.time;		//	the clock
+    this.tweens;	//	the tween manager
+    this.world;		//	the game world
+    this.particles;	//	the particle manager
+    this.physics;	//	the physics manager
+    this.rnd;		//	the repeatable random number generator
+
+    //	You can use any of these from any function within this State.
+    //	But do consider them as being 'reserved words', i.e. don't create a property for your own game called "world" or you'll over-write the world reference.
+
+};
+
+BasicGame.Game.prototype = {
+
+	function preload() {
     game.load.image('you', 'assets/you.png');
     game.load.image('me', 'assets/me.png');
     game.load.image('col', 'assets/col.png');
@@ -313,11 +315,25 @@ function endGame(){
         meScale = 2;
         youScale = 2;
     }
-    // theme.stop();
+
 }
 
-</script>
-<p>Use the arrow keys to move</p>
-<p>find your other half</p>
-</body>
-</html>
+	quitGame: function (pointer) {
+
+		//	Here you should destroy anything you no longer need.
+		//	Stop music, delete sprites, purge caches, free resources, all that good stuff.
+
+		//	Then let's go back to the main menu.
+		this.game.state.start('MainMenu');
+
+	}
+
+};
+
+
+
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload:preload,  create: create, update: update });
+
+
+
+
