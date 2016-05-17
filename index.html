@@ -27,6 +27,7 @@ function preload() {
     game.load.image('start', 'assets/start.png');
     game.load.image('lose', 'assets/lose.png');
     game.load.image('win', 'assets/win.png');
+    game.load.image('title','assets/title.png');
     game.load.audio('downYou', 'assets/downYou.mp3');
     game.load.audio('downMe', 'assets/downMe.mp3');
     game.load.audio('love', 'assets/loveloop.mp3');
@@ -48,7 +49,26 @@ var meOpacity = 1;
 var scaleUp = 0.1;
 var scaleDown = 0.025;
 var downYou, downMe, love, lose, win, theme;
-var gameStart = true;
+var gameStart = false;
+var gameStarted = false;
+var title;
+
+function restart(){
+
+    playerBounce = 0.8;
+
+    youScale = 2;
+    meScale = 2;
+    youOpacity = 1;
+    meOpacity = 1;
+    scaleUp = 0.1;
+    scaleDown = 0.025;
+    gameStart = false;
+    gameStarted = false;
+    title.destroy();
+    obstacles.destroy();
+    create();
+}
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -56,7 +76,21 @@ function getRandomInt(min, max) {
 
 function create() {
     Phaser.Canvas.setSmoothingEnabled(game.context, false);
-    // game.stage.backgroundColor = '#8e8d8d';
+    game.stage.backgroundColor = '#8e8d8d';
+    title = game.add.sprite(0,0, 'title');
+    space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    space.onDown.add(setGameStart,this);
+
+    function setGameStart(){
+        gameStart = true;
+        game.input.keyboard.removeKey(Phaser.Keyboard.SPACEBAR);
+    }
+    
+}
+
+
+
+function setup(){
     starts = game.add.group();
     var start = starts.create(game.world.width/2-50, -50, 'start');
     start.scale.x = 2;
@@ -64,7 +98,6 @@ function create() {
     start = starts.create(game.world.width/2-50, game.world.height-50, 'start' );
     start.scale.x = 2;
     start.scale.y = 2;
-
     var xMax = game.world.width/25;
     var yMax = game.world.height/25;
 
@@ -115,15 +148,27 @@ function create() {
     lose = game.add.audio('lose',1,false);
     theme = game.add.audio('theme',1,true);
     theme.play('',0,0.5,true);
+    theme.onLoop.add(playmusic,this);
+    function playmusic(){
+        theme .play('', 0, 0.5, true);
+    }
 
 
     cursor = game.input.keyboard.createCursorKeys();
+    title.destroy();
+    gameStart = false;
 }
 
 function update() {
     // Split these conditions up so that they destroy the players
     endGame();
-    if (gameStart){control()};
+    if (gameStart){
+        setup();
+        gameStarted = true;
+    }
+    if (gameStarted){
+        control();
+    }
     game.physics.collide(youPlayer, mePlayer, setScaleUp, null, this);
     game.physics.collide(youPlayer, obstacles, setScaleDownYou, null, this);
     game.physics.collide(mePlayer, obstacles, setScaleDownMe, null, this);
@@ -293,21 +338,37 @@ function endGame(){
     if (meOpacity <= 0.2 || youOpacity <= 0.2){
         lose.play();
         console.log('lost');
-        game.add.sprite(0,0, 'lose');
+        title = game.add.sprite(0,0, 'lose');
         youPlayer.kill();
         mePlayer.kill();
         theme.stop();
         meOpacity = 1;
         youOpacity = 1;
+        endRestart();
     }
     else if (meScale >=8 || youScale >= 8){
         win.play();
-        game.add.sprite(0,0, 'win')
+        title = game.add.sprite(0,0, 'win');
         youPlayer.kill();
         mePlayer.kill();
         theme.stop();
         meScale = 2;
         youScale = 2;
+
+        endRestart();
+    }
+    function endRestart(){
+        space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        space.onDown.add(setGameStart,this);
+
+        function setGameStart(){
+            // space.destroy();
+
+            console.log("restart");
+            restart();
+            // location.reload();
+
+        }
     }
     // theme.stop();
 }
